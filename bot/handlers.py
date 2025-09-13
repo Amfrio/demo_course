@@ -1,4 +1,6 @@
 import asyncio
+
+import aiohttp
 from aiogram import Router, F
 from aiogram.filters import CommandStart
 from aiogram.types import Message, CallbackQuery, LabeledPrice, PreCheckoutQuery, WebAppData
@@ -373,28 +375,22 @@ async def back_to_start_handler(callback: CallbackQuery):
 
 @router.callback_query(F.data == "check_lesson_completion")
 async def check_lesson_completion_handler(callback: CallbackQuery):
-    """Check if user completed any lessons in WebApp"""
     user_id = str(callback.from_user.id)
 
     try:
-        import httpx
         from config import config
 
-        # Check completion for lesson 1 and 2
-        for lesson_id in [1, 2]:
-            async with httpx.AsyncClient() as client:
-                response = await client.get(
+        async with aiohttp.ClientSession() as session:
+            for lesson_id in [1, 2]:
+                async with session.get(
                     f"{config.webapp_url}/api/lesson/{lesson_id}/check_completion",
                     params={"user_id": user_id}
-                )
-
-                if response.status_code == 200:
-                    data = response.json()
-
-                    if data.get("completed"):
-                        # Mark lesson as completed in bot's data
-                        score = data.get("score", 0)
-                        await data_manager.complete_lesson(user_id, lesson_id, score)
+                ) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        if data.get("completed"):
+                            score = data.get("score", 0)
+                            await data_manager.complete_lesson(user_id, lesson_id, score)
 
                         # Add achievement
                         if lesson_id == 1:
