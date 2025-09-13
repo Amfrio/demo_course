@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ lesson.title }}</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .lesson-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .lesson-title {
+            font-size: 2.5em;
+            color: #4a90e2;
+            margin: 0;
+        }
+        .lesson-subtitle {
+            font-size: 1.2em;
+            color: #666;
+            margin: 10px 0 0 0;
+        }
+        .lesson-content {
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+        .quiz-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+        .quiz-title {
+            font-size: 1.5em;
+            color: #4a90e2;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .question {
+            margin-bottom: 25px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .question h4 {
+            margin: 0 0 15px 0;
+            color: #333;
+        }
+        .option {
+            margin: 10px 0;
+        }
+        .option label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+        .option label:hover {
+            background-color: #f0f0f0;
+        }
+        .option input[type="radio"] {
+            margin-right: 10px;
+        }
+        .submit-btn {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            transition: background-color 0.3s;
+        }
+        .submit-btn:hover {
+            background: #357abd;
+        }
+        .result {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background: #e8f5e8;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .meditation-timer {
+            text-align: center;
+            background: #e8f4f8;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        .meditation-btn, .breathing-btn {
+            background: #52c5b0;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .timer, .breathing-display {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+        .hidden {
+            display: none;
+        }
+        .benefits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .benefit-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #4a90e2;
+        }
+        .nature-sounds {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .sound-option {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .sound-option:hover {
+            border-color: #4a90e2;
+            transform: translateY(-2px);
+        }
+        .sound-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .play-sound {
+            background: #52c5b0;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 15px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="lesson-header">
+            <h1 class="lesson-title">{{ lesson.title }}</h1>
+            <p class="lesson-subtitle">{{ lesson.subtitle }}</p>
+        </div>
+
+        <div class="lesson-content">
+            {{ lesson.content | safe }}
+        </div>
+
+        <div class="quiz-section">
+            <h3 class="quiz-title">📝 Проверь свои знания</h3>
+            <form id="quiz-form">
+                {% for question in lesson.quiz %}
+                <div class="question">
+                    <h4>{{ loop.index }}. {{ question.question }}</h4>
+                    {% for option in question.options %}
+                    <div class="option">
+                        <label>
+                            <input type="radio" name="question_{{ question.id }}" value="{{ option }}">
+                            {{ option }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+
+                <button type="submit" class="submit-btn">🎯 Завершить урок</button>
+            </form>
+
+            <div id="result" class="result">
+                <h3 id="result-title"></h3>
+                <p id="result-message"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Telegram WebApp
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+
+        // Wait for DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM загружен, инициализация...');
+
+            // Quiz functionality
+            console.log('Инициализация обработчика формы...');
+
+            const quizForm = document.getElementById('quiz-form');
+            console.log('Форма найдена:', quizForm);
+
+        if (quizForm) {
+            quizForm.addEventListener('submit', async function(e) {
+                console.log('Форма отправлена!');
+                e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const answers = [];
+
+            // Collect answers
+            {% for question in lesson.quiz %}
+            const answer{{ question.id }} = formData.get('question_{{ question.id }}');
+            if (answer{{ question.id }}) {
+                answers.push({
+                    question_id: {{ question.id }},
+                    answer: answer{{ question.id }}
+                });
+            }
+            {% endfor %}
+
+            // Check if all questions are answered
+            if (answers.length < {{ lesson.quiz | length }}) {
+                alert('Пожалуйста, ответьте на все вопросы!');
+                return;
+            }
+
+            console.log('Отправляю ответы:', answers);
+
+            try {
+                const response = await fetch('/api/submit-quiz', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: window.Telegram.WebApp.initDataUnsafe.user.id.toString(),
+                        lesson_id: {{ lesson_id }},
+                        answers: answers,
+                        completion_time: Date.now()
+                    })
+                });
+
+                const result = await response.json();
+
+                console.log('Результат квиза:', result);
+
+                // Show result
+                document.getElementById('result-title').textContent =
+                    `Результат: ${result.score}/${result.total} (${result.percentage.toFixed(0)}%)`;
+                document.getElementById('result-message').textContent = result.message;
+                document.getElementById('result').style.display = 'block';
+
+                // Hide form
+                document.getElementById('quiz-form').style.display = 'none';
+
+                // Notify Telegram bot about lesson completion
+                if (result.lesson_completed) {
+                    // Save completion to our API
+                    const userId = window.Telegram.WebApp.initDataUnsafe.user?.id?.toString() || 'demo_user';
+
+                    console.log('Сохраняю завершение урока...');
+
+                    fetch(`/api/lesson/${result.lesson_id}/complete`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            user_id: userId,
+                            score: result.score,
+                            percentage: result.percentage
+                        })
+                    });
+
+                    // Show completion message with button
+                    document.getElementById('result').innerHTML = `
+                        <h3>Урок завершен успешно! 🎉</h3>
+                        <p>${result.message}</p>
+                        <p><strong>Результат:</strong> ${result.score}/${result.total} (${result.percentage.toFixed(0)}%)</p>
+                        <button onclick="returnToBot()" class="submit-btn" style="margin-top: 20px;">
+                            🎁 Получить награду в боте!
+                        </button>
+                    `;
+                }
+
+            } catch (error) {
+                console.error('Error submitting quiz:', error);
+                alert('Произошла ошибка при отправке ответов. Попробуйте еще раз.');
+            }
+            });
+        } else {
+            console.error('Форма quiz-form не найдена!');
+        }
+
+            // Meditation timer functionality
+            const startMeditationBtn = document.getElementById('start-meditation');
+            const timerDiv = document.getElementById('timer');
+
+            if (startMeditationBtn && timerDiv) {
+                startMeditationBtn.addEventListener('click', function() {
+                    startMeditationBtn.style.display = 'none';
+                    timerDiv.classList.remove('hidden');
+
+                    let timeLeft = 180; // 3 minutes
+                    const timerDisplay = timerDiv.querySelector('.timer-display');
+
+                    const interval = setInterval(function() {
+                        const minutes = Math.floor(timeLeft / 60);
+                        const seconds = timeLeft % 60;
+                        timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                        if (timeLeft <= 0) {
+                            clearInterval(interval);
+                            timerDisplay.textContent = 'Медитация завершена! 🧘‍♀️';
+                        }
+                        timeLeft--;
+                    }, 1000);
+                });
+            }
+
+            // Breathing exercise functionality
+            const startBreathingBtn = document.getElementById('start-breathing');
+            const breathingGuide = document.getElementById('breathing-guide');
+
+            if (startBreathingBtn && breathingGuide) {
+                startBreathingBtn.addEventListener('click', function() {
+                    startBreathingBtn.style.display = 'none';
+                    breathingGuide.classList.remove('hidden');
+
+                    let cycle = 1;
+                    const maxCycles = 4;
+                    const instruction = breathingGuide.querySelector('.breathing-instruction');
+                    const counter = breathingGuide.querySelector('.breathing-counter');
+
+                    function doCycle() {
+                        counter.textContent = `Цикл ${cycle} из ${maxCycles}`;
+
+                        // Inhale 4 seconds
+                        instruction.textContent = 'Вдох через нос... (4 сек)';
+                        setTimeout(() => {
+                            // Hold 7 seconds
+                            instruction.textContent = 'Задержка... (7 сек)';
+                            setTimeout(() => {
+                                // Exhale 8 seconds
+                                instruction.textContent = 'Выдох через рот... (8 сек)';
+                                setTimeout(() => {
+                                    cycle++;
+                                    if (cycle <= maxCycles) {
+                                        doCycle();
+                                    } else {
+                                        instruction.textContent = 'Дыхательная практика завершена! 🌊';
+                                        counter.textContent = 'Отлично!';
+                                    }
+                                }, 8000);
+                            }, 7000);
+                        }, 4000);
+                    }
+
+                    doCycle();
+                });
+            }
+
+            // Nature sounds functionality
+            const soundButtons = document.querySelectorAll('.play-sound');
+            soundButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const soundType = this.closest('.sound-option').dataset.sound;
+                    this.textContent = 'Играет...';
+
+                    // Simulate sound playing
+                    setTimeout(() => {
+                        this.textContent = 'Слушать';
+                    }, 3000);
+                });
+            });
+        });
+
+        // Function to return to bot with lesson completion callback
+        window.returnToBot = function() {
+            // Close WebApp - this will trigger the callback in bot
+            window.Telegram.WebApp.close();
+        }
+    </script>
+</body>
+</html>

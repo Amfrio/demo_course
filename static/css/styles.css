@@ -1,0 +1,205 @@
+/* Additional styles for webapp */
+
+.audio-player {
+    background: linear-gradient(135deg, #e8f5e8, #d4e7d4);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.audio-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.play-btn, .pause-btn {
+    background: #6a5acd;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 15px rgba(106, 90, 205, 0.3);
+}
+
+.play-btn:hover, .pause-btn:hover {
+    background: #9370db;
+    transform: scale(1.1);
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.volume-slider {
+    width: 100px;
+    height: 5px;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+}
+
+.time-display {
+    font-family: monospace;
+    font-size: 1.1em;
+    color: #6a5acd;
+    min-width: 80px;
+}
+
+.achievement-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #333;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    animation: slideInRight 0.5s ease, slideOutRight 0.5s ease 3s forwards;
+    max-width: 300px;
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+.meditation-stats {
+    background: linear-gradient(135deg, #f8f9ff, #e8e6ff);
+    border: 2px solid #6a5acd;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 25px 0;
+    text-align: center;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2em;
+    font-weight: bold;
+    color: #6a5acd;
+    display: block;
+}
+
+.stat-label {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 5px;
+}
+
+.floating-hearts {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.heart {
+    position: absolute;
+    color: #ff69b4;
+    font-size: 1.5em;
+    animation: floatUp 3s ease-out forwards;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100px) scale(0);
+        opacity: 0;
+    }
+}
+
+.lesson-complete-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(106, 90, 205, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    animation: fadeIn 0.5s ease;
+}
+
+.complete-content {
+    text-align: center;
+    color: white;
+    padding: 40px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.complete-icon {
+    font-size: 5em;
+    margin-bottom: 20px;
+    animation: bounceIn 1s ease;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.complete-text {
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.complete-subtitle {
+    font-size: 1.2em;
+    opacity: 0.9;
+}
+
+/* Responsive improvements */
+@media (max-width: 480px) {
+    .audio-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .volume-control {
+        justify-content: center;
+    }
+    
+    .achievement-notification {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
